@@ -1,15 +1,23 @@
-FROM node:23.3.0-alpine
+# Use the official Node.js image
+FROM node:23.3.0
 
+# Set the working directory
 WORKDIR /app
 
+# Install dependencies
+RUN apt-get update && apt-get install -y netcat-traditional && rm -rf /var/lib/apt/lists/*
+
+# Copy package.json and package-lock.json first to leverage Docker caching
 COPY package*.json ./
 
-RUN npm install
+# Install only production dependencies
+RUN npm install --only=production
 
+# Copy the rest of the application files
 COPY . .
 
-RUN chmod 777 /app
-
+# Expose the application's port
 EXPOSE 3000
 
-CMD [ "npm","run","server" ]
+# Run the server
+CMD ["npm", "run", "server"]
